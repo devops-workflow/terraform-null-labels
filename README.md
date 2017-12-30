@@ -7,7 +7,7 @@ This is similar to [label](https://registry.terraform.io/modules/devops-workflow
 - This uses null-resource instead of locals. This was required to be able to use count.
 - Currently this does not return tags
 
-The goal is to keep [label](https://registry.terraform.io/modules/devops-workflow/label/local) and [labels](https://registry.terraform.io/modules/devops-workflow/labels/null) is sync and update both at the same time for any changes. Where this is possible.
+The goal is to keep [label](https://registry.terraform.io/modules/devops-workflow/label/local) and [labels](https://registry.terraform.io/modules/devops-workflow/labels/null) in sync and update both at the same time for any changes. Where this is possible.
 
 A single name format will not solve every use case, so multiple variants are returned and there is a few options to affect how they get build. The general name convention is `{organization}-{environment}-{name}-{attributes}`. `Name` is required, the other 3 can be turned on/off individually. The delimiter (`-`) can be changed
 
