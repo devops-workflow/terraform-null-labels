@@ -1,14 +1,23 @@
-# terraform-local-label
+# terraform-null-labels
 
 Terraform module to provide consistent label names and tags for resources.
 
+This is similar to [label](https://registry.terraform.io/modules/devops-workflow/label/local) except:
+- This accepts a list of names, instead of a string. And returns lists.
+- This uses null-resource instead of locals. This was required to be able to use count.
+- Currently this does not return tags
+
+The goal is to keep [label](https://registry.terraform.io/modules/devops-workflow/label/local) and [labels](https://registry.terraform.io/modules/devops-workflow/labels/null) is sync and update both at the same time for any changes. Where this is possible.
+
 A single name format will not solve every use case, so multiple variants are returned and there is a few options to affect how they get build. The general name convention is `{organization}-{environment}-{name}-{attributes}`. `Name` is required, the other 3 can be turned on/off individually. The delimiter (`-`) can be changed
 
-All [devops-workflow](https://registry.terraform.io/search?q=devops-workflow&verified=false) modules will eventually use this.
+All [devops-workflow](https://registry.terraform.io/modules/devops-workflow) modules will eventually use this or [label](https://registry.terraform.io/modules/devops-workflow/label/local).
 
-**NOTE:** `local` refers to this using [locals](https://www.terraform.io/docs/configuration/locals.html) and does not create any resources. It just builds new variables.
+**NOTE:** `null` refers to this using [null_resource](https://www.terraform.io/docs/configuration/locals.html)
 
-Terraform registry: https://registry.terraform.io/modules/devops-workflow/label/local
+Terraform registry: https://registry.terraform.io/modules/devops-workflow/labels/null
+
+# TODO: update rest of readme
 
 ## Usage:
 
