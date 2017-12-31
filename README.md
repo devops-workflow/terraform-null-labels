@@ -17,42 +17,44 @@ All [devops-workflow](https://registry.terraform.io/modules/devops-workflow) mod
 
 Terraform registry: https://registry.terraform.io/modules/devops-workflow/labels/null
 
-# TODO: update rest of readme
-
 ## Usage:
 
 #### Basic Example
 
 ```hcl
-module "name" {
-  source        = "devops-workflow/label/local"
-  version       = "0.1.2"
-  name          = "name"
+module "names" {
+  source        = "devops-workflow/labels/null"
+  version       = "0.0.1"
+  names         = ["name1", "name2"]
   environment   = "qa"
 }
 ```
-This will create an `id` with the value of `qa-name`
+This will create 2 `id` with the values of `qa-name1` and `qa-name2`
 
 #### S3 Example
 
 ```hcl
+variable "names" {
+  default = ["data1", "data2"]
+}
+
 module "s3-name" {
-  source        = "devops-workflow/label/local"
-  version       = "0.1.2"
-  name          = "data"
+  source        = "devops-workflow/labels/null"
+  version       = "0.0.1"
+  names         = "${var.names}"
   environment   = "qa"
   organization  = "corp"
   namespace-org = "true"
 }
 ```
-This will create an `id` with the value of `corp-qa-data`
+This will create 2 `id` with the values of `corp-qa-data1` and `corp-qa-data2`
 
-Now reference `label` outputs to create the S3 bucket
+Now reference `labels` outputs to create the S3 buckets
 
 ```hcl
 resource "aws_s3_bucket" "data" {
-  bucket  = "${module.s3-name.id}"
-  tags    = "${module.s3-name.tags}"
+  count   = "${length(var.names)}"
+  bucket  = "${element(module.s3-name.id, count.index)}"
 }
 ```
 
@@ -60,11 +62,11 @@ resource "aws_s3_bucket" "data" {
 Using in a module and exposing all settings to upstream caller.
 
 ```hcl
-module "label" {
-  source        = "devops-workflow/label/local"
-  version       = "0.1.2"
+module "labels" {
+  source        = "devops-workflow/labels/null"
+  version       = "0.0.1"
   organization  = "${var.organization}"
-  name          = "${var.name}"
+  names         = "${var.names}"
   namespace-env = "${var.namespace-env}"
   namespace-org = "${var.namespace-org}"
   environment   = "${var.environment}"
