@@ -23,12 +23,15 @@ jobs:
       - run:
           name: "Install: tflint"
           command: |
-              apk add wget
-              wget https://github.com/wata727/tflint/releases/download/v0.5.4/tflint_linux_amd64.zip
+              apk add jq wget
+              # Get latest version of tflint
+              pkg_arch=linux_amd64
+              dl_url=$(curl -s https://api.github.com/repos/wata727/tflint/releases/latest | jq -r ".assets[] | select(.name | test(\"${pkg_arch}\")) | .browser_download_url")
+              wget ${dl_url}
               unzip tflint_linux_amd64.zip
               mkdir -p /usr/local/tflint/bin
-              # TODO: CircleCI write to file for later run steps
-              #export PATH=/usr/local/tflint/bin:$PATH
+              # Setup PATH for later run steps - ONLY for Bash and not in Bash
+              #echo 'export PATH=/usr/local/tflint/bin:$PATH' >> $BASH_ENV
               echo "Installing tflint..."
               install tflint /usr/local/tflint/bin
               echo "Configuring tflint..."

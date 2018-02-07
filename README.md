@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/devops-workflow/terraform-null-labels.svg?style=svg)](https://circleci.com/gh/devops-workflow/terraform-null-labels)
+
 # terraform-null-labels
 
 Terraform module to provide consistent label names and tags for resources.
