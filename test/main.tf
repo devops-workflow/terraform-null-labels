@@ -1,13 +1,13 @@
-
 module "labels" {
   source        = "../"
-  names          = ["CapMe", "Test2"]
+  names         = ["CapMe", "Test2"]
   environment   = "Dev"
   organization  = "CorpXyZ"
   namespace-org = true
+
   #attributes    = ["role", "policy", "use", ""]
-  attributes    = ["8080"]
-  tags          = "${map("Key", "Value")}"
+  attributes        = ["8080"]
+  tags              = "${map("Key", "Value")}"
   autoscaling_group = true
 }
 
@@ -22,12 +22,13 @@ module "labels-tags" {
 }
 */
 module "labels-disabled" {
-  source        = "../"
-  names          = ["CapMe"]
-  environment   = "Dev"
-  organization  = "CorpXyZ"
-  enabled       = false
+  source       = "../"
+  names        = ["CapMe"]
+  environment  = "Dev"
+  organization = "CorpXyZ"
+  enabled      = false
 }
+
 /*
 
 module "labels-env" {
@@ -55,3 +56,4 @@ module "labels-org-env" {
   namespace-org = true
 }
 */
+
