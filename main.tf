@@ -36,100 +36,115 @@ locals = {
   org  = "${lower(format("%s", var.organization))}"
 }
 
-resource "null_resource" "names" {
+# TODO: Change to data sources
+data "null_data_source" "names" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
+  inputs = {
     id = "${replace(lower(format("%s", element(var.names, count.index))),"_","-")}"
   }
 }
 
-resource "null_resource" "env" {
+data "null_data_source" "env" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
+  inputs = {
     id = "${module.namespace-env.value ?
-      join(var.delimiter, list(local.env, element(null_resource.names.*.triggers.id, count.index))) :
-      element(null_resource.names.*.triggers.id, count.index)}"
+      join(var.delimiter, list(local.env, element(data.null_data_source.names.*.outputs.id, count.index))) :
+      element(data.null_data_source.names.*.outputs.id, count.index)}"
   }
 }
 
-resource "null_resource" "org" {
+data "null_data_source" "org" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
+  inputs = {
     id = "${module.namespace-org.value ?
-      join(var.delimiter, list(local.org, element(null_resource.env.*.triggers.id, count.index))) :
-      element(null_resource.env.*.triggers.id, count.index)}"
+      join(var.delimiter, list(local.org, element(data.null_data_source.env.*.outputs.id, count.index))) :
+      element(data.null_data_source.env.*.outputs.id, count.index)}"
   }
 }
 
-resource "null_resource" "ids" {
+data "null_data_source" "ids" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
+  inputs = {
     id = "${length(local.attr) > 0 ?
-      join(var.delimiter, list(element(null_resource.org.*.triggers.id, count.index), local.attr)) :
-      element(null_resource.org.*.triggers.id, count.index)}"
+      join(var.delimiter, list(element(data.null_data_source.org.*.outputs.id, count.index), local.attr)) :
+      element(data.null_data_source.org.*.outputs.id, count.index)}"
   }
 }
 
-resource "null_resource" "ids-trunc" {
+data "null_data_source" "ids-trunc" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
-    id_20       = "${substr(element(null_resource.ids.*.triggers.id, count.index),0,19 <= length(element(null_resource.ids.*.triggers.id, count.index)) ? 19 : length(element(null_resource.ids.*.triggers.id, count.index)))}"
-    id_32       = "${substr(element(null_resource.ids.*.triggers.id, count.index),0,31 <= length(element(null_resource.ids.*.triggers.id, count.index)) ? 31 : length(element(null_resource.ids.*.triggers.id, count.index)))}"
-    org_attr_20 = "${min(18 - length(local.attr), length(element(null_resource.org.*.triggers.id, count.index)))}"
-    org_attr_32 = "${min(30 - length(local.attr), length(element(null_resource.org.*.triggers.id, count.index)))}"
+  inputs = {
+    id_20       = "${substr(element(data.null_data_source.ids.*.outputs.id, count.index),0,19 <= length(element(data.null_data_source.ids.*.outputs.id, count.index)) ? 19 : length(element(data.null_data_source.ids.*.outputs.id, count.index)))}"
+    id_32       = "${substr(element(data.null_data_source.ids.*.outputs.id, count.index),0,31 <= length(element(data.null_data_source.ids.*.outputs.id, count.index)) ? 31 : length(element(data.null_data_source.ids.*.outputs.id, count.index)))}"
+    org_attr_20 = "${min(18 - length(local.attr), length(element(data.null_data_source.org.*.outputs.id, count.index)))}"
+    org_attr_32 = "${min(30 - length(local.attr), length(element(data.null_data_source.org.*.outputs.id, count.index)))}"
   }
 }
 
-resource "null_resource" "ids-trunc-attr" {
+data "null_data_source" "ids-trunc-attr" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  triggers = {
-    id_attr_20 = "${19 <= length(element(null_resource.ids.*.triggers.id, count.index)) ?
+  inputs = {
+    id_attr_20 = "${19 <= length(element(data.null_data_source.ids.*.outputs.id, count.index)) ?
       join(var.delimiter,
         list(
-          substr(element(null_resource.org.*.triggers.id, count.index),0,
-            element(null_resource.ids-trunc.*.triggers.org_attr_20, count.index) >= 0 ?
-              element(null_resource.ids-trunc.*.triggers.org_attr_20, count.index) : 0)
+          substr(element(data.null_data_source.org.*.outputs.id, count.index),0,
+            element(data.null_data_source.ids-trunc.*.outputs.org_attr_20, count.index) >= 0 ?
+              element(data.null_data_source.ids-trunc.*.outputs.org_attr_20, count.index) : 0)
         ),
         list(local.attr)
       )
-      : element(null_resource.ids.*.triggers.id, count.index)}"
+      : element(data.null_data_source.ids.*.outputs.id, count.index)}"
 
-    id_attr_32 = "${31 <= length(element(null_resource.ids.*.triggers.id, count.index)) ?
+    id_attr_32 = "${31 <= length(element(data.null_data_source.ids.*.outputs.id, count.index)) ?
       join(var.delimiter,
         list(
-          substr(element(null_resource.org.*.triggers.id, count.index),0,
-            element(null_resource.ids-trunc.*.triggers.org_attr_32, count.index) >= 0 ?
-              element(null_resource.ids-trunc.*.triggers.org_attr_32, count.index) : 0)
+          substr(element(data.null_data_source.org.*.outputs.id, count.index),0,
+            element(data.null_data_source.ids-trunc.*.outputs.org_attr_32, count.index) >= 0 ?
+              element(data.null_data_source.ids-trunc.*.outputs.org_attr_32, count.index) : 0)
         ),
         list(local.attr)
       )
-      : element(null_resource.ids.*.triggers.id, count.index)}"
+      : element(data.null_data_source.ids.*.outputs.id, count.index)}"
   }
 }
 
-/*
-resource "null_resource" "tags" {
+# 2 lists keys and values
+# TODO: need to change to list of maps for all label names
+data "null_data_source" "tags" {
   count = "${module.enabled.value ? length(var.names) : 0}"
-  triggers = {
+  inputs = {
     #TODO: only add Organization if not ""
-    tags  = "${ merge(
-      var.tags,
-      map(
-        "Name", "${element(null_resource.ids.*.triggers.id, count.index)}",
-        "Environment", "${local.env}",
-        "Organization", "${local.org}",
-        "Terraform", "true"
-      )
-    )}"
+    tag_keys = "Name,Environment,Organization,Terraform"
+    tag_vals = "${join(",",list(
+      element(data.null_data_source.ids.*.outputs.id, count.index),
+      local.env,
+      local.org,
+      "true")
+      )}"
   }
 }
-*/
+/*
+data "null_data_source" "tag_list" {
+  count = "${module.enabled.value ? length(var.names) : 0}"
+  inputs = {
+    tags = "${}"
+  }
+}
+/*
+output "tags" {
+  description = "Tags map merged with standard tags"
+  value       = "${merge(
+    zipmap(split(",",data.null_data_source.tags.*.outputs.tag_keys[0]),
+      split(",",data.null_data_source.tags.*.outputs.tag_vals[0])),
+    var.tags)}"
+}
+/**/
 /*
 resource "null_resource" "this" {
   count = "${module.enabled.value ? length(var.names) : 0}"
@@ -142,4 +157,3 @@ resource "null_resource" "this" {
   }
 }
 */
-
