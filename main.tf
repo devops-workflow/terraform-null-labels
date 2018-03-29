@@ -118,9 +118,11 @@ data "null_data_source" "ids-trunc-attr" {
 # TODO: need to change to list of maps for all label names
 data "null_data_source" "tags" {
   count = "${module.enabled.value ? length(var.names) : 0}"
+
   inputs = {
     #TODO: only add Organization if not ""
     tag_keys = "Name,Environment,Organization,Terraform"
+
     tag_vals = "${join(",",list(
       element(data.null_data_source.ids.*.outputs.id, count.index),
       local.env,
@@ -129,6 +131,7 @@ data "null_data_source" "tags" {
       )}"
   }
 }
+
 /*
 data "null_data_source" "tag_list" {
   count = "${module.enabled.value ? length(var.names) : 0}"
@@ -157,3 +160,4 @@ resource "null_resource" "this" {
   }
 }
 */
+

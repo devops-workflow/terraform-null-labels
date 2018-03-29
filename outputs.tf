@@ -56,7 +56,8 @@ output "organization" {
 # TODO: need to change to list of maps for all label names
 output "tags" {
   description = "Tags map merged with standard tags"
-  value       = "${merge(
+
+  value = "${merge(
     zipmap(
       split(",", element(concat(data.null_data_source.tags.*.outputs.tag_keys, list("")),0)),
       split(",", element(concat(data.null_data_source.tags.*.outputs.tag_vals, list("")),0))),
