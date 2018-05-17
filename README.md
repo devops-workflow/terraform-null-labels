@@ -7,7 +7,6 @@ Terraform module to provide consistent label names and tags for resources.
 This is similar to [label](https://registry.terraform.io/modules/devops-workflow/label/local) except:
 - This accepts a list of names, instead of a string. And returns lists.
 - This uses null-resource instead of locals. This was required to be able to use count.
-- Currently this does not return tags
 
 The goal is to keep [label](https://registry.terraform.io/modules/devops-workflow/label/local) and [labels](https://registry.terraform.io/modules/devops-workflow/labels/null) in sync and update both at the same time for any changes. Where this is possible.
 
