@@ -3,14 +3,6 @@
 #
 # TODO:
 #   Change where replace is done. Move to earlier in process. On initial `name`?
-#   Create tags_asg list from tags map. If possible
-#   New input tags_asg -> tags_asg with standard tags added
-
-module "autoscaling_group" {
-  source  = "devops-workflow/boolean/local"
-  version = "0.1.1"
-  value   = "${var.autoscaling_group}"
-}
 
 module "enabled" {
   source  = "devops-workflow/boolean/local"
@@ -114,50 +106,36 @@ data "null_data_source" "ids-trunc-attr" {
   }
 }
 
-# 2 lists keys and values
-# TODO: need to change to list of maps for all label names
+# Create tags as 2 lists keys and values
 data "null_data_source" "tags" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
   inputs = {
     #TODO: only add Organization if not ""
-    tag_keys = "Name,Environment,Organization,Terraform"
+    tag_keys = "Name,Component,Environment,Monitor,Organization,Owner,Product,Service,Team,Terraform"
 
     tag_vals = "${join(",",list(
       element(data.null_data_source.ids.*.outputs.id, count.index),
+      var.component,
       local.env,
+      var.monitor,
       local.org,
-      "true")
-      )}"
+      var.owner,
+      var.product,
+      var.service,
+      var.team,
+      "true"
+    ))}"
   }
 }
 
-/*
-data "null_data_source" "tag_list" {
+# Rebuild tags into list of maps and add any tags passed in
+data "null_data_source" "tags_list" {
   count = "${module.enabled.value ? length(var.names) : 0}"
-  inputs = {
-    tags = "${}"
-  }
-}
-/*
-output "tags" {
-  description = "Tags map merged with standard tags"
-  value       = "${merge(
-    zipmap(split(",",data.null_data_source.tags.*.outputs.tag_keys[0]),
-      split(",",data.null_data_source.tags.*.outputs.tag_vals[0])),
+
+  inputs = "${merge(
+    zipmap(
+      compact(split(",", element(data.null_data_source.tags.*.outputs.tag_keys, count.index))),
+      compact(split(",", element(data.null_data_source.tags.*.outputs.tag_vals, count.index)))),
     var.tags)}"
 }
-/**/
-/*
-resource "null_resource" "this" {
-  count = "${module.enabled.value ? length(var.names) : 0}"
-  # TODO: change all name related refs to array refs
-  # split into multi resources to be able to reference created labels
-  triggers = {
-  }
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-*/
-

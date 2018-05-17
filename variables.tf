@@ -4,28 +4,27 @@ variable "attributes" {
   default     = []
 }
 
-variable "autoscaling_group" {
-  description = "DOES NOTHING YET. If true, generate ASG tags map resource"
-  default     = false
+variable "component" {
+  description = "TAG: Underlying, dedicated piece of service (Cache, DB, ...)"
+  type        = "string"
+  default     = "UNDEF"
 }
 
 variable "delimiter" {
   description = "Delimiter to be used between `name`, `namespaces`, `attributes`, etc."
+  type        = "string"
   default     = "-"
-}
-
-variable "enabled" {
-  description = ""
-  default     = true
 }
 
 variable "environment" {
   description = "Environment (ex: `dev`, `qa`, `stage`, `prod`). (Second or top level namespace. Depending on namespacing options)"
+  type        = "string"
 }
 
-variable "names" {
-  description = "Base names for resources"
-  type        = "list"
+variable "monitor" {
+  description = "TAG: Should resource be monitored"
+  type        = "string"
+  default     = "UNDEF"
 }
 
 variable "namespace-env" {
@@ -39,12 +38,48 @@ variable "namespace-org" {
 }
 
 variable "organization" {
-  description = "Organization name (Top level namespace)."
+  description = "Organization name (Top level namespace)"
+  type        = "string"
   default     = ""
+}
+
+variable "owner" {
+  description = "TAG: Owner of the service"
+  type        = "string"
+  default     = "UNDEF"
+}
+
+variable "product" {
+  description = "TAG: Company/business product"
+  type        = "string"
+  default     = "UNDEF"
+}
+
+variable "service" {
+  description = "TAG: Application (microservice) name"
+  type        = "string"
+  default     = "UNDEF"
 }
 
 variable "tags" {
   description = "A map of additional tags"
   type        = "map"
   default     = {}
+}
+
+variable "team" {
+  description = "TAG: Department/team of people responsible for service"
+  type        = "string"
+  default     = "UNDEF"
+}
+
+// Variables different than in terraform-local-label
+variable "enabled" {
+  description = "Set to false to prevent the module from creating anything"
+  default     = true
+}
+
+variable "names" {
+  description = "Base names for resources"
+  type        = "list"
 }
