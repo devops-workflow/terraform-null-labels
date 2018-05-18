@@ -106,36 +106,23 @@ data "null_data_source" "ids-trunc-attr" {
   }
 }
 
-# Create tags as 2 lists keys and values
-data "null_data_source" "tags" {
-  count = "${module.enabled.value ? length(var.names) : 0}"
-
-  inputs = {
-    #TODO: only add Organization if not ""
-    tag_keys = "Name,Component,Environment,Monitor,Organization,Owner,Product,Service,Team,Terraform"
-
-    tag_vals = "${join(",",list(
-      element(data.null_data_source.ids.*.outputs.id, count.index),
-      var.component,
-      local.env,
-      var.monitor,
-      local.org,
-      var.owner,
-      var.product,
-      var.service,
-      var.team,
-      "true"
-    ))}"
-  }
-}
-
-# Rebuild tags into list of maps and add any tags passed in
+# Works, but will convert "true" to 1
 data "null_data_source" "tags_list" {
   count = "${module.enabled.value ? length(var.names) : 0}"
 
-  inputs = "${merge(
-    zipmap(
-      compact(split(",", element(data.null_data_source.tags.*.outputs.tag_keys, count.index))),
-      compact(split(",", element(data.null_data_source.tags.*.outputs.tag_vals, count.index)))),
-    var.tags)}"
+  inputs = "${ merge(
+    var.tags,
+    map(
+      "Component",    "${var.component}",
+      "Environment",  "${local.env}",
+      "Monitor",      "${var.monitor}",
+      "Name",         "${element(data.null_data_source.ids.*.outputs.id, count.index)}",
+      "Organization", "${local.org}",
+      "Owner",        "${var.owner}",
+      "Product",      "${var.product}",
+      "Service",      "${var.service}",
+      "Team",         "${var.team}",
+      "Terraform",    "true"
+    )
+  )}"
 }
